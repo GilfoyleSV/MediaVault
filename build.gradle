@@ -26,6 +26,7 @@ dependencies {
 	implementation platform('software.amazon.awssdk:bom:2.35.0')
 	implementation 'software.amazon.awssdk:s3'
 	implementation 'software.amazon.awssdk:s3-presigner'
+	implementation("io.minio:minio:8.6.0")
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
