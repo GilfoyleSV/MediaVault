@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#14251e">
+  <title>MediaVault — личная медиатека</title>
+  <link rel="stylesheet" href="/ui/styles.css">
+  <script type="module" src="/ui/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="wordmark" href="/" aria-label="MediaVault, главная">
+        <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true">
+          <rect width="36" height="36" rx="10" fill="#cafa82"/>
+          <path d="M9 24V12l9 7 9-7v12M13 25h10" fill="none" stroke="#14251e" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        MediaVault
+      </a>
+      <nav class="top-actions" aria-label="Навигация">
+        <a class="api-link" href="/swagger-ui.html">Документация API</a>
+        <button class="button secondary" id="sign-out" type="button" hidden>Выйти</button>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="welcome" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span></span> ПРИВАТНОЕ ХРАНИЛИЩЕ</p>
+        <h1 id="page-title">Медиатека</h1>
+        <p>Фото, аудио и видео в одном месте. Каждый аккаунт видит свой каталог.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 290 170" width="290" height="170" fill="none">
+          <path d="M30 140 139 66l121 50M64 156l109-74M100 163l106-72M28 103l127 50M75 72l127 49"
+                stroke="#b9cfb8" stroke-width="1"/>
+          <path d="M75 102 141 63l69 40-65 39z" fill="#a6bbab"/>
+          <path d="M75 87 141 48l69 40-65 39z" fill="#304d40"/>
+          <path d="M75 87v15l70 40v-15z" fill="#20392e"/>
+          <path d="m145 127 65-39v15l-65 39z" fill="#183025"/>
+          <path d="M75 66 141 27l69 40-65 39z" fill="#d2fa9c" stroke="#304d40" stroke-width="1.5"/>
+          <path d="M75 66v13l70 40v-13z" fill="#a9d478" stroke="#304d40" stroke-width="1.5"/>
+          <path d="m145 106 65-39v13l-65 39z" fill="#8fb965" stroke="#304d40" stroke-width="1.5"/>
+          <path d="m124 69 16-9 15 9-16 9z" stroke="#304d40" stroke-width="2"/>
+          <circle cx="224" cy="40" r="5" fill="#88a689"/><circle cx="56" cy="115" r="3" fill="#88a689"/>
+          <path d="M224 29v-8m12 19h8M45 115h-7m18 11v7" stroke="#88a689" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </section>
+
+    <p id="notice" class="notice" role="status" hidden></p>
+
+    <section id="auth-panel" class="panel auth-panel" aria-labelledby="auth-title">
+      <p class="eyebrow">АККАУНТ</p>
+      <h2 id="auth-title">Войти в медиатеку</h2>
+      <form id="auth-form">
+        <label for="username">Логин</label>
+        <input id="username" name="username" autocomplete="username" pattern="[a-z0-9_]{3,40}" required>
+        <label for="password">Пароль</label>
+        <input id="password" name="password" type="password" autocomplete="current-password"
+               minlength="12" maxlength="72" required>
+        <p class="hint" id="auth-hint" hidden>Логин — от 3 символов, строчные латинские буквы, цифры и «_».
+          Пароль — от 12 до 72 символов ASCII.</p>
+        <button class="button primary" type="submit" id="auth-submit">Войти</button>
+        <button class="button text-button" id="auth-switch" type="button">Создать аккаунт</button>
+      </form>
+    </section>
+
+    <div id="library" class="library" hidden>
+      <aside class="panel upload-panel" aria-labelledby="upload-title">
+        <p class="eyebrow">НОВЫЙ ФАЙЛ</p>
+        <h2 id="upload-title">Загрузка</h2>
+        <p class="hint">Файл отправляется напрямую в хранилище.</p>
+        <form id="upload-form">
+          <label for="media-file">Выбрать файл</label>
+          <input id="media-file" name="file" type="file" accept="image/*,audio/*,video/*" required>
+          <button class="button primary" type="submit" id="upload-submit">Загрузить</button>
+          <p id="upload-status" class="hint" role="status"></p>
+        </form>
+      </aside>
+
+      <section class="panel catalog-panel" aria-labelledby="catalog-title">
+        <div class="panel-heading">
+          <div><p class="eyebrow">МОИ ФАЙЛЫ</p><h2 id="catalog-title">Каталог</h2></div>
+          <button class="button secondary" id="refresh" type="button">Обновить</button>
+        </div>
+        <p id="catalog-status" class="hint" role="status"></p>
+        <ul id="media-list" class="media-list"></ul>
+        <nav class="pagination" aria-label="Страницы каталога">
+          <button class="button secondary" id="previous" type="button" disabled>Назад</button>
+          <span id="page-number">1</span>
+          <button class="button secondary" id="next" type="button" disabled>Дальше</button>
+        </nav>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="preview" aria-labelledby="preview-title">
+    <div class="panel-heading">
+      <h2 id="preview-title">Просмотр</h2>
+      <form method="dialog"><button class="button secondary">Закрыть</button></form>
+    </div>
+    <div id="preview-content" class="preview-content"></div>
+    <a id="original-link" class="button secondary" target="_blank" rel="noopener noreferrer">Открыть оригинал</a>
+  </dialog>
+</body>
+</html>
