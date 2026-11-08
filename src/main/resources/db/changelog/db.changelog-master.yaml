@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-media-asset
+      author: mediavault
+      changes:
+        - sql:
+            sql: |
+              CREATE TABLE IF NOT EXISTS media_asset (
+                  id uuid PRIMARY KEY,
+                  owner_id uuid,
+                  storage_bucket varchar(255),
+                  storage_key varchar(255) UNIQUE,
+                  original_filename varchar(255),
+                  mime_type varchar(255),
+                  size_bytes bigint,
+                  checksum_sha256 varchar(255),
+                  media_type varchar(255),
+                  status varchar(255),
+                  created_at timestamptz,
+                  updated_at timestamptz
+              );
+              ALTER TABLE media_asset ADD COLUMN cleanup_at timestamptz;
+              UPDATE media_asset SET cleanup_at = now() + interval '8 days';
+              CREATE INDEX media_asset_owner_catalog_idx
+                ON media_asset (owner_id, created_at DESC, id DESC) WHERE status <> 'DELETED';
+              CREATE INDEX media_asset_cleanup_idx
+                ON media_asset (cleanup_at, id) WHERE cleanup_at IS NOT NULL AND status <> 'READY';
+  - changeSet:
+      id: 002-accounts
+      author: mediavault
+      changes:
+        - sql:
+            sql: |
+              CREATE TABLE media_account (
+                  id uuid PRIMARY KEY,
+                  username varchar(40) NOT NULL UNIQUE,
+                  password_hash varchar(100) NOT NULL
+              );
+  - changeSet:
+      id: 003-media-thumbnails
+      author: mediavault
+      changes:
+        - sql:
+            sql: |
+              ALTER TABLE media_asset ADD COLUMN thumbnail_status varchar(255);
+              CREATE TABLE media_outbox (
+                  media_id uuid PRIMARY KEY REFERENCES media_asset(id),
+                  created_at timestamptz NOT NULL DEFAULT now()
+              );
+              CREATE INDEX media_outbox_publish_idx ON media_outbox (created_at, media_id);

@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -14,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.kuzmin.mediavault.model.MediaStatus;
 import ru.kuzmin.mediavault.model.MediaType;
+import ru.kuzmin.mediavault.model.ThumbnailStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -25,7 +24,6 @@ import java.util.UUID;
 public class MediaAsset {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private UUID ownerId;
@@ -55,25 +53,12 @@ public class MediaAsset {
 
     @UpdateTimestamp
     private Instant updatedAt;
+    private Instant cleanupAt;
 
-    public MediaAsset() {
-    }
+    @Enumerated(EnumType.STRING)
+    private ThumbnailStatus thumbnailStatus;
 
-    public MediaAsset(UUID id, UUID ownerId, String storageBucket, String storageKey,
-                      String originalFilename, String mimeType, Long sizeBytes,
-                      String checksumSha256, MediaType mediaType, MediaStatus mediaStatus,
-                      Instant createdAt, Instant updatedAt) {
-        this.id = id;
-        this.ownerId = ownerId;
-        this.storageBucket = storageBucket;
-        this.storageKey = storageKey;
-        this.originalFilename = originalFilename;
-        this.mimeType = mimeType;
-        this.sizeBytes = sizeBytes;
-        this.checksumSha256 = checksumSha256;
-        this.mediaType = mediaType;
-        this.mediaStatus = mediaStatus;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public String thumbnailKey() {
+        return "thumbnails/" + id + ".jpg";
     }
 }

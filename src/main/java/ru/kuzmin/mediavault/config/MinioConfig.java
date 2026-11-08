@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
+import java.time.Duration;
 
 @Configuration
 public class MinioConfig {
@@ -28,6 +29,9 @@ public class MinioConfig {
                         AwsBasicCredentials.create(minioProperties.getAccessKey(), minioProperties.getSecretKey())
                 ))
                 .region(Region.of(minioProperties.getRegion()))
+                .overrideConfiguration(config -> config
+                        .apiCallTimeout(Duration.ofSeconds(10))
+                        .apiCallAttemptTimeout(Duration.ofSeconds(4)))
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true)
                         .build())
@@ -48,6 +52,7 @@ public class MinioConfig {
                 .region(Region.of(minioProperties.getRegion()))
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true)
+                        .checksumValidationEnabled(false)
                         .build())
                 .build();
     }
